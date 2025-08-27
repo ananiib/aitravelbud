@@ -1,0 +1,181 @@
+h2 {
+    background-color: #f0f0f0;
+    padding: 5px 10px;
+    border-radius: 5px;
+    display: inline-block;
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  /* General Styling */
+  body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: linear-gradient(135deg, #e0f7fa, #fff3e0);
+      color: #333;
+      text-align: center;
+    }
+    
+    h1 {
+      font-size: 2rem;
+      color: #00796b;
+    }
+    
+    .author {
+      font-size: 1rem;
+      color: #00796b;
+      font-weight: lighter;
+    }
+    
+    /* Layout Styling */
+    .page-layout {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 100vh; /* Full viewport height */
+    }
+    
+    .left-column,
+    .right-column {
+      display: flex;
+      flex-direction: column;
+      gap: 20px; /* Space between tooltips */
+      width: 30%; /* Columns take 30% width each */
+    }
+    
+    .center-column {
+      width: 10%; /* Narrow column for "TRAVEL" */
+      text-align: center;
+    }
+    
+    .vertical-text {
+      font-size: 2rem;
+      color: #00796b;
+      writing-mode: vertical-rl; /* Vertical text */
+      text-orientation: upright; /* Keeps letters upright */
+      font-weight: bold;
+      letter-spacing: 5px;
+      transform: translateY(10%); /* Adjust vertical alignment */
+    }
+    
+    /* Tooltip Styling */
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+    }
+    
+    .tooltip img {
+      width: 200px; /* Fixed medium size */
+      height: 130px; /* Fixed medium size */
+      object-fit: cover; /* Ensures no distortion */
+      border-radius: 10px;
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .tooltip:hover img {
+      transform: scale(1.05); /* Slight zoom on hover */
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    /* Tooltip for Left Column: Show on Right */
+    .left-column .tooltip .tooltip-content {
+      visibility: hidden;
+      opacity: 0;
+      width: 250px;
+      background-color: #00796b;
+      color: #fff;
+      text-align: left;
+      border-radius: 5px;
+      padding: 10px;
+      position: absolute;
+      top: 50%;
+      left: 85%; /* Place tooltip on the right side */
+      transform: translateY(-50%);
+      z-index: 1;
+      transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+    }
+    
+    .left-column .tooltip:hover .tooltip-content {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    /* Tooltip for Right Column: Show on Left */
+    .right-column .tooltip .tooltip-content {
+      visibility: hidden;
+      opacity: 0;
+      width: 250px;
+      background-color: #00796b;
+      color: #fff;
+      text-align: left;
+      border-radius: 5px;
+      padding: 10px;
+      position: absolute;
+      top: 40%;
+      right: 85%; /* Place tooltip on the left side */
+      transform: translateY(-50%);
+      z-index: 1;
+      transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+    }
+    
+    .right-column .tooltip:hover .tooltip-content {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    /* Tooltip Titles */
+    .tooltip .title {
+      margin-top: 10px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #00796b;
+      text-align: center;
+    }
+    
+    /* Tooltip Arrow */
+    .tooltip::before {
+      content: '';
+      position: absolute;
+      top: 40%; /* Center arrow vertically */
+      transform: translateY(-50%);
+      border-width: 6px;
+      border-style: solid;
+      visibility: hidden; /* Initially hidden */
+      opacity: 0;
+      transition: visibility 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    }
+    
+    /* Arrow for Left Column Tooltips */
+    .left-column .tooltip::before {
+      left: 78%; /* Arrow on the left of tooltip content */
+      border-color: transparent transparent transparent #00796b;
+    }
+    
+    /* Arrow for Right Column Tooltips */
+    .right-column .tooltip::before {
+      right: 78%; /* Arrow on the right of tooltip content */
+      border-color: transparent #00796b transparent transparent;
+    }
+    
+    
+    .tooltip:hover::before {
+      visibility: visible;
+      opacity: 1;
+    }
+    footer {
+      background-color: #00796b; 
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+      font-size: 1rem;
+      position: relative; /* Make sure it takes up the full width */
+      width: 100%; /* Ensure it spans the entire width */
+      font-weight: lighter;
+      margin-top: auto; /* Ensures it sticks to the bottom of the page */
+    }
+    
+    footer p {
+      margin: 0;
+    }
