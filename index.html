@@ -184,12 +184,35 @@ document.getElementById("trip-form").addEventListener("submit", async (e) => {
 
     const data = await response.json();
     const output = document.getElementById("ai-response");
+
+    const formatItinerary = (text) => {
+      const escapeHtml = (s) => s
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+      if (!text) return '<div class="itinerary-card"><div class="itinerary-body">No content.</div></div>';
+      const escaped = escapeHtml(text.trim());
+      // Basic formatting: paragraphs and line breaks
+      const withParas = '<p>' + escaped.replace(/\n\n+/g, '</p><p>') + '</p>';
+      const withBreaks = withParas.replace(/\n/g, '<br>');
+      return `
+        <div class="itinerary-card">
+          <div class="itinerary-header">
+            <div class="itinerary-title">Your Travel Itinerary</div>
+            <div class="itinerary-badges">
+              <span class="badge">AI Plan</span>
+            </div>
+          </div>
+          <div class="itinerary-body">${withBreaks}</div>
+        </div>`;
+    };
+
     if (!response.ok || data.error) {
-      output.innerText = data.answer || `Error: ${data.error || 'Unknown error'}`;
+      output.innerHTML = formatItinerary(data.answer || `Error: ${data.error || 'Unknown error'}`);
     } else if (typeof data.answer === 'string' && data.answer.trim()) {
-      output.innerText = data.answer;
+      output.innerHTML = formatItinerary(data.answer);
     } else {
-      output.innerText = 'Sorry, no answer was generated.';
+      output.innerHTML = formatItinerary('Sorry, no answer was generated.');
     }
     
     // Show save buttons after getting response
@@ -218,12 +241,20 @@ document.getElementById("trip-form").addEventListener("submit", async (e) => {
     .then(response => response.json())
     .then(data => {
       const chatOut = document.getElementById("chat-response");
+      const formatChat = (text) => {
+        const escapeHtml = (s) => s
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;');
+        if (!text) return 'No response.';
+        return escapeHtml(text).replace(/\n/g, '<br>');
+      };
       if (data.error) {
-        chatOut.innerText = data.answer || ("Error: " + data.error);
+        chatOut.innerHTML = formatChat(data.answer || ("Error: " + data.error));
       } else if (typeof data.answer === 'string' && data.answer.trim()) {
-        chatOut.innerText = data.answer;
+        chatOut.innerHTML = formatChat(data.answer);
       } else {
-        chatOut.innerText = 'Sorry, no answer was generated.';
+        chatOut.innerHTML = 'Sorry, no answer was generated.';
       }
     })
     .catch(error => {
