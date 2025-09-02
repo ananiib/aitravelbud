@@ -15,17 +15,27 @@ def ai_response():
     user_input = data.get("question") or f"Plan a trip to {data.get('destination')} from {data.get('dateFrom')} to {data.get('dateTo')} with preferences: {data.get('preferences')}"
     
     try:
-        # Updated to use the new OpenAI API format
-        client = openai.OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
+        api_key = os.environ.get("OPENAI_API_KEY")
+        if not api_key:
+            return jsonify({
+                "answer": "⚠️ OpenAI API key is not configured on the server. Please set OPENAI_API_KEY and try again.",
+                "error": "missing_api_key"
+            }), 200
+
+        # Use the official OpenAI python client correctly
+        client = openai.OpenAI(api_key=api_key)
         response = client.chat.completions.create(
-            model="gpt-4",
-            messages=[{"role": "user", "content": user_input}],
-            max_tokens=500
+            model="gpt-4o-mini",
+            messages=[{"role": "system", "content": "You are a helpful travel planner. Provide concise, actionable itineraries."},
+                      {"role": "user", "content": user_input}],
+            max_tokens=600
         )
-        answer = response.choices[0].message.content
+
+        answer = (response.choices[0].message.content if getattr(response.choices[0], "message", None) else None) or \
+                 getattr(response.choices[0], "text", None) or "Sorry, I couldn't generate a response."
         return jsonify({"answer": answer})
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"answer": "", "error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8000)), debug=True)

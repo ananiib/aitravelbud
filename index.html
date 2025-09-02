@@ -183,7 +183,14 @@ document.getElementById("trip-form").addEventListener("submit", async (e) => {
     });
 
     const data = await response.json();
-    document.getElementById("ai-response").innerText = data.answer;
+    const output = document.getElementById("ai-response");
+    if (!response.ok || data.error) {
+      output.innerText = data.answer || `Error: ${data.error || 'Unknown error'}`;
+    } else if (typeof data.answer === 'string' && data.answer.trim()) {
+      output.innerText = data.answer;
+    } else {
+      output.innerText = 'Sorry, no answer was generated.';
+    }
     
     // Show save buttons after getting response
     document.getElementById("itinerary-actions").style.display = "block";
@@ -210,10 +217,13 @@ document.getElementById("trip-form").addEventListener("submit", async (e) => {
     })
     .then(response => response.json())
     .then(data => {
+      const chatOut = document.getElementById("chat-response");
       if (data.error) {
-        document.getElementById("chat-response").innerText = "Error: " + data.error;
+        chatOut.innerText = data.answer || ("Error: " + data.error);
+      } else if (typeof data.answer === 'string' && data.answer.trim()) {
+        chatOut.innerText = data.answer;
       } else {
-        document.getElementById("chat-response").innerText = data.answer;
+        chatOut.innerText = 'Sorry, no answer was generated.';
       }
     })
     .catch(error => {
