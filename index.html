@@ -8,6 +8,10 @@
 </head>
 <body>
   
+  <div style="max-width: 960px; margin: 10px auto 0 auto; display: flex; justify-content: flex-end; gap: 12px;">
+    <a href="/dashboard.html" style="color:#00796b; font-weight: 600; text-decoration: none;">User Dashboard</a>
+  </div>
+
 <h1>AI Travel Buddy📸✈️🍹🌍💞</h1>
 <p>Plan your next trip with personalised AI guidance!</p>
 <p style="font-size: 18px; font-weight: bold;">Start Planning</p>
@@ -133,6 +137,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const today = new Date().toISOString().split('T')[0];
     const dateFrom = document.getElementById('date-from');
     const dateTo = document.getElementById('date-to');
+    const preferencesSelect = document.getElementById('preferences');
+    const PREFS_KEY = 'atb_user_preferences';
+    const PROFILE_KEY = 'atb_user_profile';
     
     // Set minimum date to today for both fields
     dateFrom.min = today;
@@ -162,6 +169,14 @@ document.addEventListener('DOMContentLoaded', function() {
             this.value = dateFrom.value;
         }
     });
+
+    // Load saved user preferences as defaults if available
+    try {
+      const savedPrefs = JSON.parse(localStorage.getItem(PREFS_KEY) || 'null');
+      if (savedPrefs && savedPrefs.primary) {
+        preferencesSelect.value = savedPrefs.primary;
+      }
+    } catch (e) {}
 });
 
 document.getElementById("trip-form").addEventListener("submit", async (e) => {
@@ -225,7 +240,13 @@ document.getElementById("trip-form").addEventListener("submit", async (e) => {
       dateTo,
       preferences,
       response: data.answer,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      user: (function(){
+        try {
+          const p = JSON.parse(localStorage.getItem('atb_user_profile') || 'null');
+          return p ? { name: p.name || '', email: p.email || '', homeAirport: p.homeAirport || '', budget: p.budget || '' } : null;
+        } catch(e) { return null; }
+      })()
     };
   });
   

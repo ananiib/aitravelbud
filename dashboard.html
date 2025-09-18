@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Dashboard - AI Travel Buddy</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .dashboard-container { max-width: 960px; margin: 20px auto; padding: 20px; background: #ffffff; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
+    .section { margin-bottom: 24px; padding: 16px; background: #f9fafb; border-radius: 8px; }
+    .section h2 { margin-top: 0; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .grid label { display: block; font-weight: 600; margin-bottom: 6px; }
+    .grid input, .grid select, .grid textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
+    .row { margin: 10px 0; }
+    .btn { background: #00796b; color: #fff; padding: 10px 16px; border: 0; border-radius: 6px; cursor: pointer; }
+    .btn.secondary { background: #455a64; }
+    .btn.danger { background: #b00020; }
+    .flex { display: flex; gap: 8px; flex-wrap: wrap; }
+    .history-card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; margin: 10px 0; background: #ffffff; }
+    .top-nav { display: flex; justify-content: space-between; align-items: center; margin: 12px auto; max-width: 960px; }
+    .link { color: #00796b; text-decoration: none; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="top-nav">
+    <a class="link" href="/">← Back to Planner</a>
+    <a class="link" href="/dashboard.html">Dashboard</a>
+  </div>
+  <div class="dashboard-container">
+    <h1>User Dashboard</h1>
+
+    <div class="section" id="profile-section">
+      <h2>Profile</h2>
+      <div class="grid">
+        <div>
+          <label for="name">Name</label>
+          <input type="text" id="name" placeholder="Your name">
+        </div>
+        <div>
+          <label for="home-airport">Home Airport/City</label>
+          <input type="text" id="home-airport" placeholder="e.g., JFK or London">
+        </div>
+        <div>
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="you@example.com">
+        </div>
+        <div>
+          <label for="budget">Typical Budget</label>
+          <select id="budget">
+            <option value="budget">Budget</option>
+            <option value="midrange">Mid-range</option>
+            <option value="luxury">Luxury</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <label for="bio">Bio / Notes</label>
+        <textarea id="bio" rows="3" placeholder="Tell us about your travel style..."></textarea>
+      </div>
+      <div class="flex">
+        <button class="btn" onclick="saveProfile()">Save Profile</button>
+        <button class="btn secondary" onclick="loadProfile()">Reload</button>
+        <button class="btn danger" onclick="clearProfile()">Clear</button>
+      </div>
+    </div>
+
+    <div class="section" id="preferences-section">
+      <h2>Preferences</h2>
+      <div class="grid">
+        <div>
+          <label for="pref-primary">Primary Preference</label>
+          <select id="pref-primary">
+            <option value="adventure">Adventure</option>
+            <option value="relaxation">Relaxation</option>
+            <option value="culture">Culture</option>
+            <option value="food">Food</option>
+            <option value="shopping">Shopping</option>
+            <option value="romantic">Romantic</option>
+          </select>
+        </div>
+        <div>
+          <label for="pref-secondary">Secondary Preference</label>
+          <select id="pref-secondary">
+            <option value="none">None</option>
+            <option value="adventure">Adventure</option>
+            <option value="relaxation">Relaxation</option>
+            <option value="culture">Culture</option>
+            <option value="food">Food</option>
+            <option value="shopping">Shopping</option>
+            <option value="romantic">Romantic</option>
+          </select>
+        </div>
+        <div>
+          <label for="pref-diet">Dietary</label>
+          <select id="pref-diet">
+            <option value="none">None</option>
+            <option value="vegetarian">Vegetarian</option>
+            <option value="vegan">Vegan</option>
+            <option value="halal">Halal</option>
+            <option value="kosher">Kosher</option>
+            <option value="gluten-free">Gluten-free</option>
+          </select>
+        </div>
+        <div>
+          <label for="pref-travel-pace">Travel Pace</label>
+          <select id="pref-travel-pace">
+            <option value="easy">Easy-going</option>
+            <option value="balanced">Balanced</option>
+            <option value="packed">Packed itinerary</option>
+          </select>
+        </div>
+      </div>
+      <div class="flex">
+        <button class="btn" onclick="savePreferences()">Save Preferences</button>
+        <button class="btn secondary" onclick="loadPreferences()">Reload</button>
+      </div>
+    </div>
+
+    <div class="section" id="history-section">
+      <h2>Travel History</h2>
+      <div id="history-list"></div>
+      <div class="flex">
+        <button class="btn secondary" onclick="refreshHistory()">Refresh</button>
+        <button class="btn danger" onclick="clearHistory()">Clear History</button>
+      </div>
+      <p style="color:#666; font-size: 14px;">History shows trips saved from the planner and those marked as completed.</p>
+    </div>
+  </div>
+
+  <script>
+    const PROFILE_KEY = 'atb_user_profile';
+    const PREFS_KEY = 'atb_user_preferences';
+    const ITINS_KEY = 'travelItineraries';
+
+    function saveProfile() {
+      const profile = {
+        name: document.getElementById('name').value.trim(),
+        homeAirport: document.getElementById('home-airport').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        budget: document.getElementById('budget').value,
+        bio: document.getElementById('bio').value.trim(),
+        updatedAt: new Date().toISOString()
+      };
+      localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+      alert('✅ Profile saved');
+    }
+
+    function loadProfile() {
+      const p = JSON.parse(localStorage.getItem(PROFILE_KEY) || 'null');
+      if (!p) return;
+      document.getElementById('name').value = p.name || '';
+      document.getElementById('home-airport').value = p.homeAirport || '';
+      document.getElementById('email').value = p.email || '';
+      document.getElementById('budget').value = p.budget || 'midrange';
+      document.getElementById('bio').value = p.bio || '';
+    }
+
+    function clearProfile() {
+      if (!confirm('Clear profile?')) return;
+      localStorage.removeItem(PROFILE_KEY);
+      loadProfile();
+    }
+
+    function savePreferences() {
+      const prefs = {
+        primary: document.getElementById('pref-primary').value,
+        secondary: document.getElementById('pref-secondary').value,
+        diet: document.getElementById('pref-diet').value,
+        pace: document.getElementById('pref-travel-pace').value,
+        updatedAt: new Date().toISOString()
+      };
+      localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
+      alert('✅ Preferences saved');
+    }
+
+    function loadPreferences() {
+      const prefs = JSON.parse(localStorage.getItem(PREFS_KEY) || 'null');
+      if (!prefs) return;
+      document.getElementById('pref-primary').value = prefs.primary || 'adventure';
+      document.getElementById('pref-secondary').value = prefs.secondary || 'none';
+      document.getElementById('pref-diet').value = prefs.diet || 'none';
+      document.getElementById('pref-travel-pace').value = prefs.pace || 'balanced';
+    }
+
+    function renderHistory(list) {
+      const container = document.getElementById('history-list');
+      if (!list || list.length === 0) {
+        container.innerHTML = '<p class="no-itineraries">No history yet. Save a trip from the planner.</p>';
+        return;
+      }
+      container.innerHTML = list.map(i => `
+        <div class="history-card">
+          <div class="flex" style="justify-content: space-between; align-items: center;">
+            <div>
+              <strong>${i.name || (i.destination + ' Trip')}</strong>
+              <div style="color:#666; font-size: 13px;">${new Date(i.timestamp).toLocaleString()}</div>
+            </div>
+            <div class="flex">
+              <a class="btn secondary" href="/" onclick="event.preventDefault(); viewItineraryFromDash(${i.id});">View</a>
+              <button class="btn danger" onclick="deleteItin(${i.id})">Delete</button>
+            </div>
+          </div>
+          <div style="margin-top:8px; color:#333;">
+            <div><strong>Destination:</strong> ${i.destination}</div>
+            <div><strong>Dates:</strong> ${new Date(i.dateFrom).toLocaleDateString()} - ${new Date(i.dateTo).toLocaleDateString()}</div>
+            <div><strong>Preferences:</strong> ${i.preferences}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function refreshHistory() {
+      const list = JSON.parse(localStorage.getItem(ITINS_KEY) || '[]');
+      renderHistory(list);
+    }
+
+    function clearHistory() {
+      if (!confirm('Clear ALL saved itineraries?')) return;
+      localStorage.removeItem(ITINS_KEY);
+      refreshHistory();
+    }
+
+    function deleteItin(id) {
+      const list = JSON.parse(localStorage.getItem(ITINS_KEY) || '[]');
+      const updated = list.filter(i => i.id !== id);
+      localStorage.setItem(ITINS_KEY, JSON.stringify(updated));
+      refreshHistory();
+    }
+
+    function viewItineraryFromDash(id) {
+      // Reuse existing popup view logic from index via a small relay window
+      const relay = window.open('/', '_blank');
+      relay.onload = () => {
+        relay.viewItinerary && relay.viewItinerary(id);
+      };
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadProfile();
+      loadPreferences();
+      refreshHistory();
+    });
+  </script>
+</body>
+</html>
+
