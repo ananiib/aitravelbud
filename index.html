@@ -238,9 +238,51 @@ document.getElementById("trip-form").addEventListener("submit", async (e) => {
         .replace(/>/g, '&gt;');
       if (!text) return '<div class="itinerary-card"><div class="itinerary-body">No content.</div></div>';
       const escaped = escapeHtml(text.trim());
-      // Basic formatting: paragraphs and line breaks
-      const withParas = '<p>' + escaped.replace(/\n\n+/g, '</p><p>') + '</p>';
-      const withBreaks = withParas.replace(/\n/g, '<br>');
+
+      // Convert simple markdown-like text to cleaner HTML:
+      // - Strip leading # from headings
+      // - Bold lines that start with "Day ..."
+      // - Bold "Additional Tips" line
+      // - Convert leading "- " or "* " bullets into <ul><li>
+      const lines = escaped.split(/\n/);
+      const htmlParts = [];
+      let inList = false;
+
+      const flushList = () => {
+        if (inList) {
+          htmlParts.push('</ul>');
+          inList = false;
+        }
+      };
+
+      for (let raw of lines) {
+        let line = raw.trim();
+        if (!line) { flushList(); continue; }
+
+        // Strip markdown heading markers like ### or ####
+        line = line.replace(/^#{1,6}\s*/, '');
+
+        // Bold Day headers and Additional Tips
+        if (/^Day\s+/i.test(line) || /^Additional\s+Tips:?/i.test(line)) {
+          flushList();
+          htmlParts.push(`<p><strong>${line}</strong></p>`);
+          continue;
+        }
+
+        // Bullet items
+        if (/^[-*]\s+/.test(line)) {
+          if (!inList) { htmlParts.push('<ul>'); inList = true; }
+          htmlParts.push(`<li>${line.replace(/^[-*]\s+/, '')}</li>`);
+          continue;
+        }
+
+        // Default paragraph
+        flushList();
+        htmlParts.push(`<p>${line}</p>`);
+      }
+      flushList();
+
+      const html = htmlParts.join('');
       return `
         <div class="itinerary-card">
           <div class="itinerary-header">
@@ -249,7 +291,7 @@ document.getElementById("trip-form").addEventListener("submit", async (e) => {
               <span class="badge">AI Plan</span>
             </div>
           </div>
-          <div class="itinerary-body">${withBreaks}</div>
+          <div class="itinerary-body">${html}</div>
         </div>`;
     };
 
