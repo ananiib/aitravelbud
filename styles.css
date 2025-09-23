@@ -404,8 +404,8 @@ h2 {
     }
     
     .tooltip img {
-      width: 200px; /* Fixed medium size */
-      height: 130px; /* Fixed medium size */
+      width: 200px; 
+      height: 130px; 
       object-fit: cover; /* Ensures no distortion */
       border-radius: 10px;
       box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);

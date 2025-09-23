@@ -6,12 +6,17 @@
   <title>User Dashboard - AI Travel Buddy</title>
   <link rel="stylesheet" href="styles.css">
   <style>
-    .dashboard-container { max-width: 960px; margin: 20px auto; padding: 20px; background: #ffffff; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
+    .dashboard-container { max-width: 960px; margin: 20px auto; padding: 20px; background: #00796b; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
     .section { margin-bottom: 24px; padding: 16px; background: #f9fafb; border-radius: 8px; }
     .section h2 { margin-top: 0; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .grid label { display: block; font-weight: 600; margin-bottom: 6px; }
-    .grid input, .grid select, .grid textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px; }
+    .grid input, .grid select, .grid textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+    .form-field { margin-bottom: 16px; }
+    .form-field label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px; color: #374151; }
+    .form-field input, .form-field select { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+    .form-field input:focus, .form-field select:focus { outline: none; border-color: #00796b; box-shadow: 0 0 0 3px rgba(0, 119, 107, 0.1); }
+    .section .flex { margin-top: 20px; }
     .row { margin: 10px 0; }
     .btn { background: #00796b; color: #fff; padding: 10px 16px; border: 0; border-radius: 6px; cursor: pointer; }
     .btn.secondary { background: #455a64; }
@@ -20,6 +25,13 @@
     .history-card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px; margin: 10px 0; background: #ffffff; }
     .top-nav { display: flex; justify-content: space-between; align-items: center; margin: 12px auto; max-width: 960px; }
     .link { color: #00796b; text-decoration: none; font-weight: 600; }
+    
+    /* Responsive design for smaller screens */
+    @media (max-width: 768px) {
+      .grid { grid-template-columns: 1fr; gap: 12px; }
+      .dashboard-container { margin: 10px; padding: 16px; }
+      .section { padding: 12px; }
+    }
   </style>
 </head>
 <body>
@@ -33,19 +45,19 @@
     <div class="section" id="profile-section">
       <h2>Profile</h2>
       <div class="grid">
-        <div>
+        <div class="form-field">
           <label for="name">Name</label>
           <input type="text" id="name" placeholder="Your name">
         </div>
-        <div>
+        <div class="form-field">
           <label for="home-airport">Home Airport/City</label>
           <input type="text" id="home-airport" placeholder="e.g., JFK or London">
         </div>
-        <div>
+        <div class="form-field">
           <label for="email">Email</label>
           <input type="email" id="email" placeholder="you@example.com">
         </div>
-        <div>
+        <div class="form-field">
           <label for="budget">Typical Budget</label>
           <select id="budget">
             <option value="budget">Budget</option>
@@ -68,7 +80,7 @@
     <div class="section" id="preferences-section">
       <h2>Preferences</h2>
       <div class="grid">
-        <div>
+        <div class="form-field">
           <label for="pref-primary">Primary Preference</label>
           <select id="pref-primary">
             <option value="adventure">Adventure</option>
@@ -79,7 +91,7 @@
             <option value="romantic">Romantic</option>
           </select>
         </div>
-        <div>
+        <div class="form-field">
           <label for="pref-secondary">Secondary Preference</label>
           <select id="pref-secondary">
             <option value="none">None</option>
@@ -91,7 +103,7 @@
             <option value="romantic">Romantic</option>
           </select>
         </div>
-        <div>
+        <div class="form-field">
           <label for="pref-diet">Dietary</label>
           <select id="pref-diet">
             <option value="none">None</option>
@@ -102,7 +114,7 @@
             <option value="gluten-free">Gluten-free</option>
           </select>
         </div>
-        <div>
+        <div class="form-field">
           <label for="pref-travel-pace">Travel Pace</label>
           <select id="pref-travel-pace">
             <option value="easy">Easy-going</option>

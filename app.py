@@ -55,5 +55,59 @@ def ai_response():
             return jsonify({"answer": friendly, "error": "insufficient_quota"}), 200
         return jsonify({"answer": "", "error": error_text}), 500
 
+@app.route("/suggest-destinations", methods=["POST"])
+def suggest_destinations():
+    """
+    Returns a small list of destination strings suggested by AI.
+    Response: { destinations: ["Paris", "Rome", "Barcelona"] }
+    """
+    try:
+        api_key = os.environ.get("OPENAI_API_KEY")
+        # Fallback if no API key: return a static example
+        if not api_key:
+            return jsonify({"destinations": ["Paris", "Rome", "Barcelona"]})
+
+        org_id = os.environ.get("OPENAI_ORG")
+        if org_id:
+            client = openai.OpenAI(api_key=api_key, organization=org_id)
+        else:
+            client = openai.OpenAI(api_key=api_key)
+
+        prompt = (
+            "Suggest exactly 3 highly recommended travel destinations as a JSON array of strings. "
+            "Only output the JSON array, no extra text."
+        )
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "You are a concise travel assistant."},
+                {"role": "user", "content": prompt},
+            ],
+            max_tokens=60,
+            temperature=0.5,
+        )
+        raw = (response.choices[0].message.content if getattr(response.choices[0], "message", None) else None) or \
+              getattr(response.choices[0], "text", None) or "[]"
+
+        # Best-effort parse JSON array
+        import json
+        try:
+            arr = json.loads(raw)
+            if not isinstance(arr, list):
+                arr = []
+        except Exception:
+            arr = []
+
+        # Fallback if model didn't return parsable array
+        if not arr:
+            arr = ["Paris", "Rome", "Barcelona"]
+
+        # Clean to strings only
+        arr = [str(x) for x in arr][:3]
+        return jsonify({"destinations": arr})
+    except Exception as e:
+        # On any error, provide a friendly fallback
+        return jsonify({"destinations": ["Paris", "Rome", "Barcelona"], "error": str(e)}), 200
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8000)), debug=True)
