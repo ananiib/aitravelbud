@@ -244,7 +244,10 @@ document.getElementById("trip-form").addEventListener("submit", async (e) => {
       // - Bold lines that start with "Day ..."
       // - Bold "Additional Tips" line
       // - Convert leading "- " or "* " bullets into <ul><li>
-      const lines = escaped.split(/\n/);
+      // Convert inline **bold** first
+      const withBold = escaped.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+      const lines = withBold.split(/\n/);
       const htmlParts = [];
       let inList = false;
 
@@ -258,6 +261,9 @@ document.getElementById("trip-form").addEventListener("submit", async (e) => {
       for (let raw of lines) {
         let line = raw.trim();
         if (!line) { flushList(); continue; }
+
+        // Map horizontal rule
+        if (/^\s*-{3,}\s*$/.test(line)) { flushList(); htmlParts.push('<hr>'); continue; }
 
         // Strip markdown heading markers like ### or ####
         line = line.replace(/^#{1,6}\s*/, '');
@@ -276,7 +282,8 @@ document.getElementById("trip-form").addEventListener("submit", async (e) => {
           continue;
         }
 
-        // Default paragraph
+        // Default paragraph (remove stray asterisks that might remain around punctuation)
+        line = line.replace(/\s?\*/g, '');
         flushList();
         htmlParts.push(`<p>${line}</p>`);
       }
