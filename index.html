@@ -334,6 +334,9 @@ document.getElementById("trip-form").addEventListener("submit", async (e) => {
         } catch(e) { return null; }
       })()
     };
+
+    // After rendering, auto-plot the typed destinations and detected places from the itinerary
+    plotFromInputAndItinerary(destination, data.answer || '');
   });
   
   function askAI() {
@@ -369,6 +372,95 @@ document.getElementById("trip-form").addEventListener("submit", async (e) => {
     });
   }
   
+  // --- Auto-plot destinations and itinerary places on the home map ---
+  function parseDestinationInput(input) {
+    if (!input) return [];
+    return input.split(',').map(s => s.trim()).filter(s => s.length > 0);
+  }
+
+  function extractPlaceCandidatesFromText(text) {
+    if (!text) return [];
+    // Heuristic: capture capitalized word sequences (optionally with connectors like de, of, the)
+    const connectors = '(?:de|la|del|di|da|do|du|of|the|and|&|y)';
+    const pattern = new RegExp(
+      `\\b([A-Z][a-zÀ-ÖØ-öø-ÿ]+(?:\\s+(?:${connectors}|[A-Z][a-zÀ-ÖØ-öø-ÿ]+|[A-Z]{2,}))*)\\b`,
+      'g'
+    );
+    const blacklist = new Set([
+      'Morning', 'Afternoon', 'Evening', 'Night', 'Lunch', 'Dinner', 'Breakfast',
+      'Day', 'Additional Tips', 'AM', 'PM', 'Options', 'Activity', 'Transport', 'Time'
+    ]);
+    const results = new Set();
+    let m;
+    while ((m = pattern.exec(text)) !== null) {
+      const candidate = m[1].trim();
+      if (candidate.length < 3) continue;
+      if (blacklist.has(candidate)) continue;
+      // Skip lines that are clearly not places (contain numbers-only or overly long)
+      if (/^\d/.test(candidate)) continue;
+      if (candidate.length > 60) continue;
+      results.add(candidate);
+      if (results.size >= 12) break;
+    }
+    return Array.from(results);
+  }
+
+  async function geocodeName(name) {
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(name)}`;
+      const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+      const json = await r.json();
+      if (Array.isArray(json) && json.length > 0) {
+        const { lat, lon, display_name } = json[0];
+        return { name: name, label: display_name || name, lat: parseFloat(lat), lng: parseFloat(lon) };
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  async function plotFromInputAndItinerary(destinationInput, itineraryText) {
+    try {
+      initHomeMap();
+      const names = [
+        ...parseDestinationInput(destinationInput),
+        ...extractPlaceCandidatesFromText(itineraryText)
+      ];
+      // Deduplicate keeping order
+      const seen = new Set();
+      const uniqueNames = names.filter(n => {
+        const key = n.toLowerCase();
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      }).slice(0, 15);
+
+      const results = [];
+      for (const n of uniqueNames) {
+        const geo = await geocodeName(n);
+        if (geo) results.push(geo);
+        // Gentle rate limit
+        await new Promise(res => setTimeout(res, 250));
+      }
+
+      if (!results.length) return;
+
+      // Clear and plot
+      homeMarkerLayer.clearLayers();
+      const bounds = [];
+      for (const p of results) {
+        const m = L.marker([p.lat, p.lng]).addTo(homeMarkerLayer);
+        m.bindPopup(p.label || p.name);
+        bounds.push([p.lat, p.lng]);
+      }
+      if (bounds.length) {
+        homeMapInstance.fitBounds(bounds, { padding: [30, 30] });
+      }
+      homeSaveMarkers(homeGetCurrentMarkers());
+    } catch (_) {
+      // ignore plotting errors
+    }
+  }
+
   // Save current itinerary to local storage
   function saveItinerary() {
     if (!window.currentItinerary) {
