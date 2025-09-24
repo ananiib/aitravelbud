@@ -177,6 +177,9 @@ h2 {
     min-height: 50px;
   }
 
+  /* Hide inline itinerary container when empty to avoid blank white box */
+  #ai-response:empty { display: none; }
+
   /* Itinerary Card Styling */
   .itinerary-card {
     border: 1px solid #e5e7eb;
