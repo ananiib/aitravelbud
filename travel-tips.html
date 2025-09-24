@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Travel Tips</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div style="max-width: 960px; margin: 10px auto 0 auto; display: flex; justify-content: space-between; align-items:center; gap: 12px;">
+    <a href="/index.html" style="color:#00796b; font-weight: 600; text-decoration: none;">← Back to Planner</a>
+    <a href="/dashboard.html" style="color:#00796b; font-weight: 600; text-decoration: none;">User Dashboard</a>
+  </div>
+
+  <h1>Travel Tips 🍸🎟🧳🌟</h1>
+  <p class="author">Curated tips to make your trips smoother</p>
+
+  <div id="tips-nav" style="max-width:960px;margin:0 auto 10px auto;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+    <button class="btn" onclick="filterTips('all')">All</button>
+    <button class="btn secondary" onclick="filterTips('Flights')">Flights</button>
+    <button class="btn secondary" onclick="filterTips('Packing')">Packing</button>
+    <button class="btn secondary" onclick="filterTips('Accommodation')">Accommodation</button>
+    <button class="btn secondary" onclick="filterTips('Activities')">Activities</button>
+    <button class="btn secondary" onclick="filterTips('Food')">Food</button>
+    <button class="btn secondary" onclick="filterTips('Memories')">Memories</button>
+  </div>
+
+  <div class="page-layout" id="travel-tips">
+    <div class="left-column">
+      <div class="tooltip" data-category="Flights">
+        <img src="https://i.ibb.co/kS2WcNt/IMG-5883.jpg" alt="Flight Tips">
+        <div class="title">Flights</div>
+        <div class="tooltip-content">
+          <p>Check for cheaper flights on weekdays, and use incognito mode while searching!</p>
+        </div>
+      </div>
+      <div class="tooltip" data-category="Packing">
+        <img src="https://i.ibb.co/tM9zdgK/IMG-5884.jpg" alt="Packing Tips">
+        <div class="title">Packing</div>
+        <div class="tooltip-content">
+          <p>Roll your clothes to save space, and don't forget to pack a power adapter!</p>
+        </div>
+      </div>
+      <div class="tooltip" data-category="Accommodation">
+        <img src="https://i.ibb.co/740sd1D/IMG-5886.jpg" alt="Accommodation Tips">
+        <div class="title">Accommodation</div>
+        <div class="tooltip-content">
+          <p>Research reviews on booking sites and look for hidden gems with good safety ratings.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="center-column">
+      <p class="vertical-text">TRAVEL</p>
+    </div>
+
+    <div class="right-column">
+      <div class="tooltip" data-category="Activities">
+        <img src="https://i.ibb.co/R0C306c/IMG-5892.jpg" alt="Activity Tips">
+        <div class="title">Activities</div>
+        <div class="tooltip-content">
+          <p>Leave room for spontaneous adventures! Plan activities ahead to ensure you do not miss out on gems!</p>
+        </div>
+      </div>
+      <div class="tooltip" data-category="Food">
+        <img src="https://i.ibb.co/H79y3YP/IMG-5887.jpg" alt="Food Tips">
+        <div class="title">Food</div>
+        <div class="tooltip-content">
+          <p>Always try traditional local food for authentic flavors, but ensure it's from clean and trusted vendors.</p>
+        </div>
+      </div>
+      <div class="tooltip" data-category="Memories">
+        <img src="https://i.ibb.co/s6YbnkW/IMG-5890.jpg" alt="Memories Tips">
+        <div class="title">Memories</div>
+        <div class="tooltip-content">
+          <p>Capture moments, write about your experiences, and cherish the memories you create!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Every destination brings out a new adventure, Live It! 🌍✈️</p>
+  </footer>
+
+  <script>
+    function filterTips(category) {
+      const container = document.getElementById('travel-tips');
+      if (!container) return;
+      const cards = container.querySelectorAll('.tooltip');
+      cards.forEach(card => {
+        const cat = card.getAttribute('data-category') || '';
+        if (category === 'all' || category === '' || cat === category) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>
+
