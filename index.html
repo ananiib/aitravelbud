@@ -83,7 +83,7 @@
 </div>
 
 <!-- Saved Itineraries Section -->
-<div class="saved-itineraries">
+<div class="saved-itineraries" id="saved-itineraries-section" style="display: none;">
   <h3>💼 Saved Itineraries</h3>
   <div id="saved-list"></div>
 </div>
@@ -547,13 +547,17 @@ document.getElementById("trip-form").addEventListener("submit", async (e) => {
   function loadSavedItineraries() {
     const savedItineraries = JSON.parse(localStorage.getItem('travelItineraries') || '[]');
     const savedList = document.getElementById('saved-list');
+    const section = document.getElementById('saved-itineraries-section');
     
     if (savedItineraries.length === 0) {
-      savedList.innerHTML = '<p class="no-itineraries">No saved itineraries yet. Generate and save your first trip plan! 🚀</p>';
+      section.style.display = 'none';
+      savedList.innerHTML = '';
       return;
     }
-    
-    savedList.innerHTML = savedItineraries.map(itinerary => `
+    section.style.display = 'block';
+    const toShow = savedItineraries.slice(-2); // show the most recent two
+
+    savedList.innerHTML = toShow.map(itinerary => `
       <div class="saved-itinerary" data-id="${itinerary.id}">
         <div class="itinerary-header">
           <h4>${itinerary.name}</h4>
@@ -570,6 +574,14 @@ document.getElementById("trip-form").addEventListener("submit", async (e) => {
         </div>
       </div>
     `).join('');
+
+    // If more than two exist, add a "View more" button to dashboard history
+    if (savedItineraries.length > 2) {
+      const more = document.createElement('div');
+      more.style.marginTop = '10px';
+      more.innerHTML = `<a href="/dashboard.html#travel-history" class="btn" style="text-decoration:none;">📚 View more</a>`;
+      savedList.appendChild(more);
+    }
   }
   
   // View a specific itinerary
