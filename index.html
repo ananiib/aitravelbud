@@ -387,20 +387,12 @@ document.getElementById("trip-form").addEventListener("submit", async (e) => {
     .then(response => response.json())
     .then(data => {
       const chatOut = document.getElementById("chat-response");
-      const formatChat = (text) => {
-        const escapeHtml = (s) => s
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;');
-        if (!text) return 'No response.';
-        return escapeHtml(text).replace(/\n/g, '<br>');
-      };
       if (data.error) {
-        chatOut.innerHTML = formatChat(data.answer || ("Error: " + data.error));
+        chatOut.innerHTML = formatItinerary(data.answer || ("Error: " + data.error));
       } else if (typeof data.answer === 'string' && data.answer.trim()) {
-        chatOut.innerHTML = formatChat(data.answer);
+        chatOut.innerHTML = formatItinerary(data.answer);
       } else {
-        chatOut.innerHTML = 'Sorry, no answer was generated.';
+        chatOut.innerHTML = formatItinerary('Sorry, no answer was generated.');
       }
     })
     .catch(error => {
