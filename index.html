@@ -310,6 +310,19 @@ function formatItinerary(text) {
     </div>`;
 }
 
+// Chat-specific card with different title
+function formatChatCard(text) {
+  const body = formatItineraryBodyHTML(text);
+  if (!body) return '<div class="itinerary-card"><div class="itinerary-body">No response.</div></div>';
+  return `
+    <div class="itinerary-card">
+      <div class="itinerary-header">
+        <div class="itinerary-title">Hey There Buddy :)</div>
+      </div>
+      <div class="itinerary-body">${body}</div>
+    </div>`;
+}
+
 function formatItineraryToPlainText(text) {
   // Use the HTML formatter, then strip tags to produce clean text without * or #
   const html = formatItineraryBodyHTML(text);
@@ -388,11 +401,11 @@ document.getElementById("trip-form").addEventListener("submit", async (e) => {
     .then(data => {
       const chatOut = document.getElementById("chat-response");
       if (data.error) {
-        chatOut.innerHTML = formatItinerary(data.answer || ("Error: " + data.error));
+        chatOut.innerHTML = formatChatCard(data.answer || ("Error: " + data.error));
       } else if (typeof data.answer === 'string' && data.answer.trim()) {
-        chatOut.innerHTML = formatItinerary(data.answer);
+        chatOut.innerHTML = formatChatCard(data.answer);
       } else {
-        chatOut.innerHTML = formatItinerary('Sorry, no answer was generated.');
+        chatOut.innerHTML = formatChatCard('Sorry, no answer was generated.');
       }
     })
     .catch(error => {
@@ -458,7 +471,8 @@ document.getElementById("trip-form").addEventListener("submit", async (e) => {
       const countryBlacklist = new Set(['france','spain','italy','germany','europe','africa','asia','america']);
       const dedup = (arr) => { const s = new Set(); return arr.filter(n=>{const k=n.toLowerCase(); if(s.has(k)) return false; s.add(k); return true;}); };
 
-      const cleanInput = dedup(inputNames).filter(n => !countryBlacklist.has(n.toLowerCase()));
+      // Always try to plot user-typed destinations (no blacklist on input)
+      const cleanInput = dedup(inputNames);
       const anchorResults = [];
       for (const n of cleanInput) {
         const geo = await geocodeName(n);
