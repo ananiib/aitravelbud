@@ -394,7 +394,11 @@ document.getElementById("trip-form").addEventListener("submit", async (e) => {
   // --- Auto-plot destinations and itinerary places on the home map ---
   function parseDestinationInput(input) {
     if (!input) return [];
-    return input.split(',').map(s => s.trim()).filter(s => s.length > 0);
+    // Split on commas or ' and ' to catch inputs like "Paris, Rome" or "Paris and Rome"
+    return input
+      .split(/,|\band\b/gi)
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
   }
 
   function extractPlaceCandidatesFromText(text) {
@@ -450,6 +454,32 @@ document.getElementById("trip-form").addEventListener("submit", async (e) => {
     return null;
   }
 
+  // Fallback geocoder using Photon (Komoot)
+  async function geocodeFallback(name) {
+    try {
+      const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(name)}&limit=1`;
+      const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+      const json = await r.json();
+      if (json && Array.isArray(json.features) && json.features.length > 0) {
+        const f = json.features[0];
+        const [lng, lat] = f.geometry && Array.isArray(f.geometry.coordinates) ? f.geometry.coordinates : [null, null];
+        if (lat != null && lng != null) {
+          const props = f.properties || {};
+          const label = props.name || props.city || props.country || name;
+          const countryCode = (props.countrycode || '').toUpperCase();
+          const cls = props.type === 'city' ? 'place' : 'tourism';
+          const type = props.type || 'city';
+          return { name, label, lat: parseFloat(lat), lng: parseFloat(lng), countryCode, cls, type };
+        }
+      }
+    } catch (e) { /* ignore */ }
+    return null;
+  }
+
+  async function geocodeNameWithFallback(name) {
+    return (await geocodeName(name)) || (await geocodeFallback(name));
+  }
+
   async function plotFromInputAndItinerary(destinationInput, itineraryText) {
     try {
       initHomeMap();
@@ -463,14 +493,14 @@ document.getElementById("trip-form").addEventListener("submit", async (e) => {
       const cleanInput = dedup(inputNames);
       const anchorResults = [];
       for (const n of cleanInput) {
-        const geo = await geocodeName(n);
+        const geo = await geocodeNameWithFallback(n);
         if (geo) anchorResults.push(geo);
         await new Promise(res => setTimeout(res, 250));
       }
       const anchorCountry = (anchorResults.find(r => r.countryCode)?.countryCode) || '';
       // If still no anchor and we have an input string, try geocoding the plain destination string
       if (!anchorCountry && (destinationInput || '').trim()) {
-        const fallback = await geocodeName(destinationInput.trim());
+        const fallback = await geocodeNameWithFallback(destinationInput.trim());
         if (fallback) {
           anchorResults.push(fallback);
         }
@@ -481,7 +511,7 @@ document.getElementById("trip-form").addEventListener("submit", async (e) => {
         .slice(0, 20);
       const extractedResults = [];
       for (const n of filteredExtracted) {
-        const geo = await geocodeName(n);
+        const geo = await geocodeNameWithFallback(n);
         if (geo) {
           const isPlace = (geo.cls === 'place' && ['city','town','village','hamlet','neighbourhood','suburb'].includes(geo.type));
           const isTourism = (geo.cls === 'tourism');
@@ -503,7 +533,9 @@ document.getElementById("trip-form").addEventListener("submit", async (e) => {
         m.bindPopup(p.label || p.name);
         bounds.push([p.lat, p.lng]);
       }
-      if (bounds.length) {
+      if (bounds.length === 1) {
+        homeMapInstance.setView(bounds[0], 8);
+      } else if (bounds.length) {
         homeMapInstance.fitBounds(bounds, { padding: [30, 30] });
       }
       homeSaveMarkers(homeGetCurrentMarkers());
