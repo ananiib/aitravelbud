@@ -294,6 +294,9 @@ document.getElementById("trip-form").addEventListener("submit", async (e) => {
     const dateTo = document.getElementById("date-to").value;
     const preferences = document.getElementById("preferences").value;
 
+    // Immediately plot the entered destination(s) so users see pins right away
+    plotFromInputAndItinerary(destination, '');
+
     const response = await fetch("/ai", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
