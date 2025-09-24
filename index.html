@@ -45,7 +45,7 @@
   </div>
   
   <label for="preferences">Preferences (choose one or more):</label>
-  <select name="preferences" id="preferences" multiple>
+  <select name="preferences" id="preferences" multiple size="6">
     <option value="adventure">Adventure</option>
     <option value="relaxation">Relaxation</option>
     <option value="culture">Culture</option>
@@ -231,6 +231,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
     } catch (e) {}
+
+    // Improve UX: allow clicking to toggle options without Cmd/Ctrl
+    preferencesSelect.addEventListener('mousedown', function(e) {
+      if (e.target && e.target.tagName === 'OPTION') {
+        e.preventDefault();
+        const option = e.target;
+        option.selected = !option.selected;
+      }
+    });
 });
 
 // Formatting utilities shared by main view, print, and share
