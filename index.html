@@ -118,12 +118,21 @@
   
 </div>
 
-     <h2>AI Travel Buddy Chat</h2>
-<div class="chat-input">
-  <input type="text" id="question" placeholder="Ask a travel question">
-  <button onclick="askAI()">Send</button>
-</div>
-<div id="chat-response"></div>
+    <!-- Floating Chat Button and Popup -->
+    <div id="chat-fab" style="position: fixed; right: 22px; bottom: 22px; width: 58px; height: 58px; border-radius: 50%; background: #00796b; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 24px; box-shadow: 0 8px 20px rgba(0,0,0,0.25); z-index: 1100;" onclick="toggleChatWidget()" title="AI Travel Buddy Chat" aria-label="AI Travel Buddy Chat">
+      💬
+    </div>
+    <div id="chat-popup" style="display: none; position: fixed; right: 22px; bottom: 90px; width: 320px; max-height: 60vh; background: white; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); overflow: hidden; z-index: 1100;">
+      <div style="display:flex; align-items:center; justify-content: space-between; padding: 10px 12px; background: #00796b; color: white;">
+        <div style="font-weight: 700;">Hey There Buddy :)</div>
+        <button onclick="toggleChatWidget(false)" aria-label="Close chat" style="background: transparent; border: none; color: white; font-size: 18px; cursor: pointer;">×</button>
+      </div>
+      <div id="chat-response" style="padding: 10px; height: 260px; overflow: auto;"></div>
+      <div style="display:flex; gap: 6px; padding: 10px; border-top: 1px solid #e5e7eb; background: #fafafa;">
+        <input type="text" id="question" placeholder="Ask a travel question" style="flex:1; padding: 8px 10px; border: 1px solid #e5e7eb; border-radius: 6px;" onkeydown="if(event.key==='Enter'){askAI();}">
+        <button class="btn" onclick="askAI()">Send</button>
+      </div>
+    </div>
   
   <footer>
     <p>Every destination brings out a new adventure, Live It! 🌍✈️</p>
@@ -371,6 +380,15 @@ document.getElementById("trip-form").addEventListener("submit", async (e) => {
     .catch(error => {
       document.getElementById("chat-response").innerText = "Error: " + error.message;
     });
+  }
+  function toggleChatWidget(force) {
+    const popup = document.getElementById('chat-popup');
+    if (!popup) return;
+    if (typeof force === 'boolean') {
+      popup.style.display = force ? 'block' : 'none';
+      return;
+    }
+    popup.style.display = (popup.style.display === 'none' || popup.style.display === '') ? 'block' : 'none';
   }
   
   // --- Auto-plot destinations and itinerary places on the home map ---
