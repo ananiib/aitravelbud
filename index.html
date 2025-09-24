@@ -427,16 +427,26 @@ document.getElementById("trip-form").addEventListener("submit", async (e) => {
   }
 
   async function geocodeName(name) {
-    try {
-      const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&q=${encodeURIComponent(name)}`;
-      const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
-      const json = await r.json();
-      if (Array.isArray(json) && json.length > 0) {
-        const { lat, lon, display_name, address = {}, class: cls, type } = json[0];
-        const countryCode = (address.country_code || '').toUpperCase();
-        return { name: name, label: display_name || name, lat: parseFloat(lat), lng: parseFloat(lon), countryCode, cls, type };
-      }
-    } catch (_) {}
+    const variants = [
+      name,
+      `${name} country`,
+      `${name} city`,
+      `${name}, Europe`
+    ];
+    for (const query of variants) {
+      try {
+        const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&q=${encodeURIComponent(query)}`;
+        const r = await fetch(url, { headers: { 'Accept': 'application/json' } });
+        const json = await r.json();
+        if (Array.isArray(json) && json.length > 0) {
+          const { lat, lon, display_name, address = {}, class: cls, type } = json[0];
+          const countryCode = (address.country_code || '').toUpperCase();
+          return { name: name, label: display_name || name, lat: parseFloat(lat), lng: parseFloat(lon), countryCode, cls, type };
+        }
+      } catch (e) { /* ignore and try next variant */ }
+      // Be polite to the service
+      await new Promise(res => setTimeout(res, 200));
+    }
     return null;
   }
 
@@ -458,6 +468,13 @@ document.getElementById("trip-form").addEventListener("submit", async (e) => {
         await new Promise(res => setTimeout(res, 250));
       }
       const anchorCountry = (anchorResults.find(r => r.countryCode)?.countryCode) || '';
+      // If still no anchor and we have an input string, try geocoding the plain destination string
+      if (!anchorCountry && (destinationInput || '').trim()) {
+        const fallback = await geocodeName(destinationInput.trim());
+        if (fallback) {
+          anchorResults.push(fallback);
+        }
+      }
 
       const filteredExtracted = dedup(extractedNames)
         .filter(n => !countryBlacklist.has(n.toLowerCase()))
