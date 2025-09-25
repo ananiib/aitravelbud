@@ -73,7 +73,7 @@
         <div style="font-weight: 700; color: #00796b;">Your Travel Itinerary</div>
         <button id="itinerary-modal-close" aria-label="Close itinerary" style="background: transparent; border: none; font-size: 22px; line-height: 1; cursor: pointer; color: #6b7280;">×</button>
       </div>
-      <div id="itinerary-modal-body" style="padding: 16px; max-height: 70vh; overflow: auto;"></div>
+      <div id="itinerary-modal-body" style="padding: 0; max-height: 70vh; overflow: auto;"></div>
       <div style="display:flex; justify-content: flex-end; gap: 8px; padding: 12px 16px; border-top: 1px solid #e5e7eb;">
         <button onclick="saveItinerary()" class="save-btn">💾 Save</button>
         <button onclick="shareItinerary()" class="share-btn">📤 Share</button>
@@ -264,16 +264,16 @@ function formatItineraryBodyHTML(text) {
 function formatItinerary(text) {
   const body = formatItineraryBodyHTML(text);
   if (!body) return '<div class="itinerary-card"><div class="itinerary-body">No content.</div></div>';
-  return `
-    <div class="itinerary-card">
-      <div class="itinerary-header">
-        <div class="itinerary-title">Your Travel Itinerary</div>
-        <div class="itinerary-badges">
-          <span class="badge">AI Plan</span>
-        </div>
-      </div>
-      <div class="itinerary-body">${body}</div>
-    </div>`;
+      return `
+        <div class="itinerary-card" style="max-width: 840px; margin: 0 auto;">
+          <div class="itinerary-header">
+            <div class="itinerary-title">Your Travel Itinerary</div>
+            <div class="itinerary-badges">
+              <span class="badge">AI Plan</span>
+            </div>
+          </div>
+          <div class="itinerary-body">${body}</div>
+        </div>`;
 }
 
 // Chat-specific card with different title
