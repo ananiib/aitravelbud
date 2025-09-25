@@ -217,10 +217,26 @@ h2 {
     padding: 18px;
     line-height: 1.6;
     color: #374151;
+    text-align: left; /* ensure left-aligned content in modal */
   }
 
   .itinerary-body p {
     margin: 0 0 12px 0;
+  }
+
+  /* Improve list readability and indentation inside itinerary (neutral theme) */
+  .itinerary-body ul,
+  .itinerary-body ol {
+    margin: 8px 0 16px 22px;
+    padding-left: 18px;
+  }
+  .itinerary-body li {
+    margin: 6px 0;
+  }
+  .itinerary-body hr {
+    border: 0;
+    border-top: 1px solid #e5e7eb;
+    margin: 16px 0;
   }
   
   /* Itinerary Actions Styling */
