@@ -536,3 +536,41 @@ h2 {
     footer p {
       margin: 0;
     }
+
+  /* --- Dark Theme (root class .dark on <html>) --- */
+  .dark body {
+    background: #0b1416;
+    color: #e5e7eb;
+  }
+  .dark h1, .dark h2, .dark .author {
+    color: #a7f3d0;
+  }
+  .dark #trip-form,
+  .dark #ai-response,
+  .dark #chat-response,
+  .dark .saved-itineraries,
+  .dark .saved-itinerary,
+  .dark .itinerary-card,
+  .dark .section {
+    background: #0f1c1f;
+    border-color: #1f2a2e;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+  }
+  .dark .itinerary-header {
+    background: linear-gradient(135deg, #0b2a2a, #1a1f24);
+    border-bottom-color: #1f2a2e;
+  }
+  .dark .itinerary-body hr { border-top-color: #1f2a2e; }
+  .dark select, .dark input, .dark textarea {
+    background: #0b1416;
+    color: #e5e7eb;
+    border-color: #1f2a2e;
+  }
+  .dark .btn { background: #0ea5e9; color: #0b1416; }
+  .dark .btn.secondary { background: #334155; color: #e5e7eb; }
+  .dark .save-btn { background: #0ea5e9; color: #0b1416; }
+  .dark .share-btn { background: #f97316; }
+  .dark .view-btn { background: #0ea5e9; color: #0b1416; }
+  .dark .delete-btn { background: #ef4444; }
+  .dark .itinerary-details strong { color: #a7f3d0; }
+  .dark footer { background-color: #0b2a2a; color: #e5e7eb; }
