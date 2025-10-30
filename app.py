@@ -13,7 +13,7 @@ def index():
 def ai_response():
     data = request.json
     user_input = data.get("question") or f"Plan a trip to {data.get('destination')} from {data.get('dateFrom')} to {data.get('dateTo')} with preferences: {data.get('preferences')}"
-    
+
     try:
         api_key = os.environ.get("OPENAI_API_KEY")
         if not api_key:
@@ -22,7 +22,6 @@ def ai_response():
                 "error": "missing_api_key"
             }), 200
 
-        # Use the official OpenAI python client correctly
         org_id = os.environ.get("OPENAI_ORG")
         if org_id:
             client = openai.OpenAI(api_key=api_key, organization=org_id)
@@ -63,7 +62,7 @@ def suggest_destinations():
     """
     try:
         api_key = os.environ.get("OPENAI_API_KEY")
-        # Fallback if no API key: return a static example
+        
         if not api_key:
             return jsonify({"destinations": ["Paris", "Rome", "Barcelona"]})
 
@@ -89,7 +88,7 @@ def suggest_destinations():
         raw = (response.choices[0].message.content if getattr(response.choices[0], "message", None) else None) or \
               getattr(response.choices[0], "text", None) or "[]"
 
-        # Best-effort parse JSON array
+
         import json
         try:
             arr = json.loads(raw)
@@ -98,15 +97,15 @@ def suggest_destinations():
         except Exception:
             arr = []
 
-        # Fallback if model didn't return parsable array
+
         if not arr:
             arr = ["Paris", "Rome", "Barcelona"]
 
-        # Clean to strings only
+
         arr = [str(x) for x in arr][:3]
         return jsonify({"destinations": arr})
     except Exception as e:
-        # On any error, provide a friendly fallback
+
         return jsonify({"destinations": ["Paris", "Rome", "Barcelona"], "error": str(e)}), 200
 
 if __name__ == "__main__":
