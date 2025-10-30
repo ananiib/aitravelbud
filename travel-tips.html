@@ -9,7 +9,10 @@
 <body>
   <div style="max-width: 960px; margin: 10px auto 0 auto; display: flex; justify-content: space-between; align-items:center; gap: 12px;">
     <a href="/index.html" style="color:#00796b; font-weight: 600; text-decoration: none;">← Back to Planner</a>
-    <a href="/dashboard.html" style="color:#00796b; font-weight: 600; text-decoration: none;">User Dashboard</a>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <button id="theme-toggle" class="btn secondary" style="padding:6px 10px; font-size:12px;">🌙 Dark</button>
+      <a href="/dashboard.html" style="color:#00796b; font-weight: 600; text-decoration: none;">User Dashboard</a>
+    </div>
   </div>
 
   <h1>Travel Tips 🍸🎟🧳🌟</h1>
@@ -75,6 +78,33 @@
   </footer>
 
   <script>
+    // Theme: dark mode toggle with persistence (shared with index.html)
+    (function initTheme(){
+      const KEY = 'atb_theme';
+      const root = document.documentElement;
+      const btn = document.getElementById('theme-toggle');
+      const apply = (mode) => {
+        if (mode === 'dark') {
+          root.classList.add('dark');
+          if (btn) btn.textContent = '☀️ Light';
+        } else {
+          root.classList.remove('dark');
+          if (btn) btn.textContent = '🌙 Dark';
+        }
+      };
+      try {
+        const saved = localStorage.getItem(KEY) || '';
+        apply(saved === 'dark' ? 'dark' : 'light');
+      } catch(_) { apply('light'); }
+      if (btn) {
+        btn.addEventListener('click', () => {
+          const isDark = document.documentElement.classList.toggle('dark');
+          try { localStorage.setItem(KEY, isDark ? 'dark' : 'light'); } catch(_){ }
+          btn.textContent = isDark ? '☀️ Light' : '🌙 Dark';
+        });
+      }
+    })();
+
     function filterTips(category) {
       const container = document.getElementById('travel-tips');
       if (!container) return;

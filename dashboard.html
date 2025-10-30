@@ -37,7 +37,10 @@
 <body>
   <div class="top-nav">
     <a class="link" href="/">← Back to Planner</a>
-    <a class="link" href="/dashboard.html">Dashboard</a>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <button id="theme-toggle" class="btn secondary" style="padding:6px 10px; font-size:12px;">🌙 Dark</button>
+      <a class="link" href="/dashboard.html">Dashboard</a>
+    </div>
   </div>
   <div class="dashboard-container">
     <h1>User Dashboard</h1>
@@ -141,6 +144,33 @@
   </div>
 
   <script>
+    // Theme: dark mode toggle with persistence (shared with index.html)
+    (function initTheme(){
+      const KEY = 'atb_theme';
+      const root = document.documentElement;
+      const btn = document.getElementById('theme-toggle');
+      const apply = (mode) => {
+        if (mode === 'dark') {
+          root.classList.add('dark');
+          if (btn) btn.textContent = '☀️ Light';
+        } else {
+          root.classList.remove('dark');
+          if (btn) btn.textContent = '🌙 Dark';
+        }
+      };
+      try {
+        const saved = localStorage.getItem(KEY) || '';
+        apply(saved === 'dark' ? 'dark' : 'light');
+      } catch(_) { apply('light'); }
+      if (btn) {
+        btn.addEventListener('click', () => {
+          const isDark = document.documentElement.classList.toggle('dark');
+          try { localStorage.setItem(KEY, isDark ? 'dark' : 'light'); } catch(_){ }
+          btn.textContent = isDark ? '☀️ Light' : '🌙 Dark';
+        });
+      }
+    })();
+
     const PROFILE_KEY = 'atb_user_profile';
     const PREFS_KEY = 'atb_user_preferences';
     const ITINS_KEY = 'travelItineraries';
